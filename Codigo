@@ -1,0 +1,174 @@
+#include<fcntl.h>//Trabalhar com arquivos
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include <locale.h>//Resolve Problemas de Acentuação
+#include<windows.h>//para função Sleep
+
+//############=======>>>>>>>>       Struct Estruturas       <<<<<<<<<========##################
+
+struct DadosCarros {
+    char Modelo[30];
+    char Marca[30];
+    float PrecoDia;
+    int DateIn;
+    int DateOut;
+};
+
+struct DadosCliente {
+    char Nome[30];
+    int Cpf;
+    int Telefone;
+};
+
+
+
+//############=======>>>>>>>>       Funções                 <<<<<<<<<========##################
+void redirecionamento();
+int MenuPricipal();
+int CadastrarClientes();
+
+
+//############=======>>>>>>>>       Variaveis Globais       <<<<<<<<<========##################
+int IndexClt = 0;
+int IndexCar = 0;
+struct DadosCliente Clientes[50];
+struct DadosCarros Carros[50];
+
+//#####################################
+char limpar[3] = "cls";
+
+int main (){
+    setlocale(LC_ALL,"Portuguese");//Coloca a localidade para ajustar os acentos
+    while(1){
+        MenuPricipal();
+    }
+    MenuPricipal();
+}
+
+ int MenuPricipal (){
+    int menu;
+
+    system(limpar);//Limpa a tela
+    printf("#################################\n");
+    printf("#                               #\n");
+    printf("# 1 - Cadastro Clientes         #\n");
+    printf("# 2 - Cadastro Carros           #\n");
+    printf("# 3 - Reservar Carro            #\n");
+    printf("# 4 - Consultar Carro           #\n");
+    printf("# 5 - Ver Carros Cadastrados    #\n");
+    printf("# 6 - Ver Clientes Cadastrados  nãí #\n");
+    printf("#                               #\n");
+    printf("#################################\n");
+    scanf("%d",&menu);
+
+        switch (menu){
+            case 1:
+                //printf("CadastrarClientes\n");
+                CadastrarClientes();
+            break;
+            case 2:
+                CadastrarCarro();
+            break;
+            case 3:
+                printf("ReservaCarro\n");
+                //ReservaCarro();
+            break;
+            case 4:
+                //printf("ConsultaReserva\n");
+                ConsultaCarro();
+            case 5:
+                VerCarros();
+            break;
+            case 6:
+                VerClts();
+            break;
+            default:
+                system(limpar);
+                printf("Não Jovem!!!!!\nÉ 1 a 4\n");
+                redirecionamento(5);
+                MenuPricipal();
+        }
+        return 1;
+
+ }
+
+void redirecionamento(int Seg){
+    int i;
+    i = 0;
+    for(i = Seg; i > 0;i--){
+        printf("Você sera redirecionado em %d",i);
+        Sleep(1000);
+        //usleep(1000*1000);
+	      printf("\r");//Retorna carro ou escreve na mesma linha
+    }
+    return;
+}
+
+int CadastrarClientes(){
+    system(limpar);
+    printf("Insira o Nome do cliente =>");
+    fflush(stdin);
+    fgets(Clientes[IndexClt].Nome,sizeof(Clientes[IndexClt].Nome),stdin);
+    fflush(stdin);
+
+    printf("\nInsira o CPF do cliente =>");
+    scanf("%d",&Clientes[IndexClt].Cpf);
+
+    printf("\nInsira o Telefone do cliente =>");
+    scanf("%d",&Clientes[IndexClt].Telefone);
+    IndexClt++;
+    return 1;
+
+}
+
+int CadastrarCarro(){
+
+    system(limpar);
+    printf("Insira o MODELO do carro =>");
+    fflush(stdin);
+    fgets(Carros[IndexCar].Modelo,sizeof(Carros[IndexCar].Modelo),stdin);
+
+    printf("\nInsira MARCA do carro =>");
+    fflush(stdin);
+    fgets(Carros[IndexCar].Marca,sizeof(Carros[IndexCar].Marca),stdin);
+
+    printf("\nInsira o Preço da Diaria do carro =>");
+    scanf("%d",&Carros[IndexCar].PrecoDia);
+
+    Carros[IndexCar].DateIn = 0;
+    Carros[IndexCar].DateOut = 0;
+    IndexCar++;
+    return 1;
+}
+
+int VerClts(){
+    system(limpar);
+    int i;
+    for(i = 0; i < IndexClt;i++ ){
+        printf("Nome: %s \n",Clientes[i].Nome);
+        printf("CPF: %d \n",Clientes[i].Cpf);
+        printf("Telefone: %d \n",Clientes[i].Telefone);
+        printf("####################################\n");
+    }
+        printf("______________________________________");
+        getchar();
+        getchar();
+}
+
+int VerCarros(){
+    system(limpar);
+    int i;
+    for(i = 0; i < IndexCar;i++ ){
+        printf("Modelo: %s \n",Carros[i].Modelo);
+        printf("Marca: %s \n",Carros[i].Marca);
+        printf("PrecoDia: %d \n",Carros[i].PrecoDia);
+        printf("Data Entrada: %d \n",Carros[i].DateIn);
+        printf("Data Saida: %d \n",Carros[i].DateOut);
+        printf("####################################\n");
+    }
+    printf("______________________________________");
+    getchar();
+    getchar();
+}
+
