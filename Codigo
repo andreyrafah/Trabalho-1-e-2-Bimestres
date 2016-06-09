@@ -13,12 +13,14 @@ struct DadosCarros {
     float PrecoDia;
     int DateIn;
     int DateOut;
+    int idCltAlugado;
 };
 
 struct DadosCliente {
     char Nome[30];
     int Cpf;
     int Telefone;
+    int idCarroAlugado;
 };
 
 
@@ -57,7 +59,8 @@ int main (){
     printf("# 3 - Reservar Carro            #\n");
     printf("# 4 - Consultar Carro           #\n");
     printf("# 5 - Ver Carros Cadastrados    #\n");
-    printf("# 6 - Ver Clientes Cadastrados  nãí #\n");
+    printf("# 6 - Ver Clientes Cadastrados  #\n");
+    printf("# 7 - Ver Carros Reservados     #\n");
     printf("#                               #\n");
     printf("#################################\n");
     scanf("%d",&menu);
@@ -71,17 +74,21 @@ int main (){
                 CadastrarCarro();
             break;
             case 3:
-                printf("ReservaCarro\n");
+                ReservaCarro();
                 //ReservaCarro();
             break;
             case 4:
                 //printf("ConsultaReserva\n");
                 ConsultaCarro();
+            break;
             case 5:
-                VerCarros();
+                VerCarros(IndexCar);
             break;
             case 6:
                 VerClts();
+            break;
+            case 7:
+                verReservados();
             break;
             default:
                 system(limpar);
@@ -95,7 +102,6 @@ int main (){
 
 void redirecionamento(int Seg){
     int i;
-    i = 0;
     for(i = Seg; i > 0;i--){
         printf("Você sera redirecionado em %d",i);
         Sleep(1000);
@@ -110,13 +116,15 @@ int CadastrarClientes(){
     printf("Insira o Nome do cliente =>");
     fflush(stdin);
     fgets(Clientes[IndexClt].Nome,sizeof(Clientes[IndexClt].Nome),stdin);
+    Clientes[IndexClt].Nome[strlen(Clientes[IndexClt].Nome)-1] = '\0';
     fflush(stdin);
 
-    printf("\nInsira o CPF do cliente =>");
+    printf("Insira o CPF do cliente =>");
     scanf("%d",&Clientes[IndexClt].Cpf);
 
-    printf("\nInsira o Telefone do cliente =>");
+    printf("Insira o Telefone do cliente =>");
     scanf("%d",&Clientes[IndexClt].Telefone);
+    Clientes[IndexClt].idCarroAlugado = -1;
     IndexClt++;
     return 1;
 
@@ -125,19 +133,22 @@ int CadastrarClientes(){
 int CadastrarCarro(){
 
     system(limpar);
-    printf("Insira o MODELO do carro =>");
+    printf("Insira o MODELO do carro => ");
     fflush(stdin);
     fgets(Carros[IndexCar].Modelo,sizeof(Carros[IndexCar].Modelo),stdin);
+    Carros[IndexCar].Modelo[strlen(Carros[IndexCar].Modelo)-1] = '\0';
 
-    printf("\nInsira MARCA do carro =>");
+    printf("Insira MARCA do carro =>  ");
     fflush(stdin);
     fgets(Carros[IndexCar].Marca,sizeof(Carros[IndexCar].Marca),stdin);
+    Carros[IndexCar].Marca[strlen(Carros[IndexCar].Marca)-1] = '\0';
 
-    printf("\nInsira o Preço da Diaria do carro =>");
-    scanf("%d",&Carros[IndexCar].PrecoDia);
+    printf("Insira o Preço da Diaria do carro =>  ");
+    scanf("%f",&Carros[IndexCar].PrecoDia);
 
     Carros[IndexCar].DateIn = 0;
     Carros[IndexCar].DateOut = 0;
+    Carros[IndexCar].idCltAlugado = -1;
     IndexCar++;
     return 1;
 }
@@ -156,19 +167,278 @@ int VerClts(){
         getchar();
 }
 
-int VerCarros(){
+int VerCarros(int x){
     system(limpar);
     int i;
-    for(i = 0; i < IndexCar;i++ ){
+    for(i = 0; i < x;i++ ){
         printf("Modelo: %s \n",Carros[i].Modelo);
         printf("Marca: %s \n",Carros[i].Marca);
-        printf("PrecoDia: %d \n",Carros[i].PrecoDia);
+        printf("PrecoDia: R$ %.2f \n",Carros[i].PrecoDia);
         printf("Data Entrada: %d \n",Carros[i].DateIn);
         printf("Data Saida: %d \n",Carros[i].DateOut);
-        printf("####################################\n");
+        printf("\n####################################\n");
     }
-    printf("______________________________________");
+    printf("___________________________FIM___________________________");
     getchar();
     getchar();
 }
 
+int ConsultaCarro(){
+    int menu,len,i,countPesquisa;
+    float minimo,maximo;
+    char Nome[30];
+    countPesquisa = 0;
+
+    system(limpar);//Limpa a tela
+    printf("#####################################\n");
+    printf("#                                   #\n");
+    printf("# 1 - Pesquisar por Nome do Modelo  #\n");
+    printf("# 2 - Pesquisar por Nome do Marca   #\n");
+    printf("# 3 - Por Valor Da Diaria           #\n");
+    printf("#                                   #\n");
+    printf("#####################################\n");
+    scanf("%d",&menu);
+
+        switch (menu){
+            case 1:
+                ProcurrorModelo();
+            break;
+
+            case 2:
+                printf("Nome da MARCA ?\n => ");
+                fflush(stdin);
+                fgets(Nome,sizeof(Nome),stdin);
+                Nome[strlen(Nome)-1] = '\0';
+                len = strlen(Nome);
+                for(i = 0;i<= IndexCar;i++){
+                        if(strncmp(Nome,Carros[i].Marca,len) == 0){
+                            VerCarros(i);
+                            countPesquisa++;
+                        }
+                }
+                if(countPesquisa == 0){
+                    printf("Nenhum carro encontrado\n...Pressione ENTER para voltar\n");
+                    getchar();
+                }else{
+                    printf("%d Carros encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+                    getchar();
+                }
+            break;
+            case 3:
+                printf("Qual o valor MAXIMO da diaria \n => ");
+                scanf("%f",&maximo);
+                printf("Qual o valor MINIMO da diaria \n => ");
+                scanf("%f",&minimo);
+
+                printf("maximo %.2f , minimo  %.2f",maximo,minimo);
+                getchar();
+                getchar();
+                for(i = 0;i<= IndexCar;i++){
+                        if((Carros[i].PrecoDia >= minimo) && (Carros[i].PrecoDia <= maximo)){
+                            VerCarros(i);
+                            countPesquisa++;
+                        }
+                }
+                if(countPesquisa == 0){
+                    printf("Nenhum carro encontrado\n...Pressione ENTER para voltar\n");
+                    getchar();
+                }else{
+                    printf("%d Carros encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+                    getchar();
+                }
+
+
+            break;
+            default:
+                system(limpar);
+                printf("Não Jovem!!!!!\nÉ 1 a 4\n");
+                redirecionamento(5);
+                ConsultaCarro();
+        }
+        return 1;
+}
+
+int ProcurrorModelo(){
+    char Nome[30];
+    int len,i,countPesquisa;
+    countPesquisa = 0;
+
+    printf("Nome do MODELO ?");
+    fflush(stdin);
+    fgets(Nome,sizeof(Nome),stdin);
+    Nome[strlen(Nome)-1] = '\0';
+    len = strlen(Nome);
+    for(i = 0;i<= IndexCar;i++){
+            if(strncmp(Nome,Carros[i].Modelo,len) == 0){
+                VerCarro(i);
+                countPesquisa++;
+            }
+    }
+    if(countPesquisa == 0){
+        printf("Nenhum carro encontrado\n...Pressione ENTER para voltar\n");
+        getchar();
+        return 0;//Nada Achado
+    }else{
+        printf("%d Carros encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+        getchar();
+        return 1;//Carro Achado
+    }
+}
+
+int ReservaCarro(){
+int idCarro,idClt;
+printf("Procure o carro que gosratia de alugar\n");
+while(ProcurrorModelo() == 0){};
+
+printf("Qual o ID do carro ?\n => ");
+scanf("%d",&idCarro);
+while(idCarro >= IndexCar){
+    printf("Essa ID não esta cadastrado, Favor insira um ID existente !\n ");
+    scanf("%d",&idCarro);
+}
+while(ProcurarCliente() == 0){};
+
+printf("Para qual cliente ?\n");
+
+
+scanf("%d",&idClt);
+while(idClt >= IndexClt){
+    printf("Essa ID não esta cadastrado, Favor insira um ID existente !\n Insira o ID => ");
+    scanf("%d",&idClt);
+}
+Carros[idCarro].idCltAlugado = idClt;
+Clientes[idClt].idCarroAlugado = idCarro;
+system(limpar);
+printf("\n Você reservou o Carro \n");
+VerCarro(idClt);
+printf("\n Para o Cliente \n");
+VerClt(idClt);
+printf("Para Proseguir aperte ENTER \n");
+getchar();
+getchar();
+}
+
+int VerCarro(int i){
+    printf("ID: %d \n",i);
+    printf("Modelo: %s \n",Carros[i].Modelo);
+    printf("Marca: %s \n",Carros[i].Marca);
+    printf("PrecoDia: R$ %.2f \n",Carros[i].PrecoDia);
+    printf("Data Entrada: %d \n",Carros[i].DateIn);
+    printf("Data Saida: %d \n",Carros[i].DateOut);
+
+}
+
+int ProcurarCliente(){
+    int menu,len,i,countPesquisa,numero;
+    char Nome[30];
+    countPesquisa = 0;
+
+    system(limpar);//Limpa a tela
+    printf("#####################################\n");
+    printf("#                                   #\n");
+    printf("# 1 - Pesquisar por Nome do Cliente #\n");
+    printf("# 2 - Pesquisar por CPF do cliente  #\n");
+    printf("# 3 - Por telefone                  #\n");
+    printf("#                                   #\n");
+    printf("#####################################\n");
+    scanf("%d",&menu);
+
+        switch (menu){
+            case 1:
+                printf("Nome do Cliente ?");
+                fflush(stdin);
+                fgets(Nome,sizeof(Nome),stdin);
+                Nome[strlen(Nome)-1] = '\0';
+                len = strlen(Nome);
+                for(i = 0;i <= IndexCar;i++){
+                        if(strncmp(Nome,Clientes[i].Nome,len) == 0){
+                            VerClt(i);
+                            countPesquisa++;
+                        }
+                }
+                if(countPesquisa == 0){
+                    printf("Nenhum Cliente encontrado\n...Pressione ENTER para voltar\n");
+                    getchar();
+                    return 0;//Nada Achado
+                }else{
+                    printf("%d Clientes encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+                    getchar();
+                    return 1;//Carro Achado
+                }
+
+            break;
+
+            case 2:
+                printf("Qual o valor CPF do Cliente \n => ");
+                scanf("%d",&numero);
+                for(i = 0;i<= IndexCar;i++){
+                        if(numero == Clientes[i].Cpf){
+                            VerClt(i);
+                            countPesquisa++;
+                        }
+                }
+                if(countPesquisa == 0){
+                    printf("Nenhum Cliente encontrado\n...Pressione ENTER para voltar\n");
+                    getchar();
+                    return 0;//Nada Achado
+                }else{
+                    printf("%d Clientes encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+                    getchar();
+                    return 1;//Carro Achado
+                }
+
+
+            break;
+            case 3:
+                printf("Qual o valor CPF do Cliente \n => ");
+                scanf("%d",&numero);
+                for(i = 0;i<= IndexCar;i++){
+                        if(numero == Clientes[i].Telefone){
+                            VerClt(i);
+                            countPesquisa++;
+                        }
+                }
+                if(countPesquisa == 0){
+                    printf("Nenhum Cliente encontrado\n...Pressione ENTER para voltar\n");
+                    getchar();
+                    return 0;//Nada Achado
+                }else{
+                    printf("%d Clientes encontrados\n...Pressione ENTER para voltar\n",countPesquisa);
+                    getchar();
+                    return 1;//Carro Achado
+                }
+
+            break;
+            default:
+                system(limpar);
+                printf("Não Jovem!!!!!\nÉ 1 a 4\n");
+                redirecionamento(5);
+                ConsultaCarro();
+        }
+        return 1;
+
+
+}
+
+int VerClt(int i){
+    printf("ID: %d \n",i);
+    printf("Nome: %s \n",Clientes[i].Nome);
+    printf("CPF: %d \n",Clientes[i].Cpf);
+    printf("Telefone: %d \n",Clientes[i].Telefone);
+}
+
+int verReservados(){
+    int i;
+    for(i = 0;i< IndexCar;i++){
+        if(Carros[i].idCltAlugado >= 0){
+            printf("\n Carro =>\n");
+            VerCarro(i);
+            printf("\n Cliente =>\n");
+            VerClt(Carros[i].idCltAlugado);
+            printf("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n\n");
+        }
+    }
+    printf("Para Continuar insira ENTER\n");
+    getchar();
+    getchar();
+}
